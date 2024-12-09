@@ -191,8 +191,8 @@ fn find_ternary_expressions(
   n: usize,
 ) {
   for k1 in 1..n.saturating_sub(2) {
-    for k2 in 1..n.saturating_sub(k1).saturating_sub(1) {
-      let k3 = n.saturating_sub(k1).saturating_sub(k2).saturating_sub(2);
+    for k2 in 1..n.saturating_sub(k1 + 1) {
+      let k3 = n.saturating_sub(k1 + k2 + 2);
       if k3 < 1 {
         continue;
       }
