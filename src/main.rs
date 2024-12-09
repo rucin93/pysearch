@@ -188,39 +188,43 @@ fn find_ternary_expressions(
   cn: &mut CacheLevel,
   cache: &Cache,
   hashset_cache: &HashSetCache,
-  n: usize) {
+  n: usize,
+) {
   for k1 in 1..n.saturating_sub(2) {
     for k2 in 1..n.saturating_sub(k1).saturating_sub(1) {
       let k3 = n.saturating_sub(k1).saturating_sub(k2).saturating_sub(2);
       if k3 < 1 {
-          continue;
+        continue;
       }
 
       for condition in &cache[k1] {
-          for true_expr in &cache[k2] {
-              for false_expr in &cache[k3] {
-                if !OP_TERNARY.can_apply(&condition, &true_expr, &false_expr) {
-                  continue;
-                }
-                if let Some(output) = OP_TERNARY.vec_apply(true_expr.output.clone(),condition.output.clone(), false_expr.output.clone()) {
-
-                  save(
-                    cn,
-                    Expr::ternary(
-                      condition.into(),
-                      true_expr.into(),
-                      false_expr.into(),
-                      OP_INDEX_TERNARY,
-                      condition.var_count.clone(),
-                      output,
-                    ),
-                    n,
-                    cache,
-                    hashset_cache
-                  );
-                }
-              }
+        for true_expr in &cache[k2] {
+          for false_expr in &cache[k3] {
+            if !OP_TERNARY.can_apply(&condition, &true_expr, &false_expr) {
+              continue;
+            }
+            if let Some(output) = OP_TERNARY.vec_apply(
+              true_expr.output.clone(),
+              condition.output.clone(),
+              false_expr.output.clone(),
+            ) {
+              save(
+                cn,
+                Expr::ternary(
+                  condition.into(),
+                  true_expr.into(),
+                  false_expr.into(),
+                  OP_INDEX_TERNARY,
+                  condition.var_count.clone(),
+                  output,
+                ),
+                n,
+                cache,
+                hashset_cache,
+              );
+            }
           }
+        }
       }
     }
   }
