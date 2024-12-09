@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use crate::{
     expr::{ok_after_keyword, ok_before_keyword, Expr},
-    params::{Num, BINARY_OPERATORS, ERROR_VALUE, UNARY_OPERATORS, TERNARY_OPERATORS},
+    params::{Num, BINARY_OPERATORS, ERROR_VALUE, UNARY_OPERATORS},
     vec::Vector,
 };
 
@@ -557,6 +557,7 @@ pub const OP_TERNARY: TernaryOp = TernaryOp {
 
 // All operators: [..Binary, ..Unary, Parens, Literal, Variable]
 pub const NUM_OPERATORS: usize = UNARY_OPERATORS.len() + BINARY_OPERATORS.len() + 3;
+pub const OP_INDEX_TERNARY: OpIndex = OpIndex::new(0xFC);
 pub const OP_INDEX_PARENS: OpIndex = OpIndex::new(0xFD);
 pub const OP_INDEX_LITERAL: OpIndex = OpIndex::new(0xFE);
 pub const OP_INDEX_VARIABLE: OpIndex = OpIndex::new(0xFF);
@@ -564,11 +565,9 @@ pub const OP_INDEX_VARIABLE: OpIndex = OpIndex::new(0xFF);
 const fn gen_index_tables() -> (
     [OpIndex; BINARY_OPERATORS.len()],
     [OpIndex; UNARY_OPERATORS.len()],
-    [OpIndex; TERNARY_OPERATORS.len()],
 ) {
     let mut binary_table = [OpIndex::new(0); BINARY_OPERATORS.len()];
     let mut unary_table = [OpIndex::new(0); UNARY_OPERATORS.len()];
-    let mut ternary_table = [OpIndex::new(0); TERNARY_OPERATORS.len()];
     let mut cnt = [0; 16];
 
     let mut i: usize = 0;
@@ -589,21 +588,11 @@ const fn gen_index_tables() -> (
         i += 1;
     }
 
-    let mut i: usize = 0;
-    while i < TERNARY_OPERATORS.len() {
-        let prec = TERNARY_OPERATORS[i].prec;
-        assert!(prec < 16 && cnt[prec as usize] < 16);
-        ternary_table[i] = OpIndex(prec << 4 | cnt[prec as usize]);
-        cnt[prec as usize] += 1;
-        i += 1;
-    }
-
-    (binary_table, unary_table, ternary_table)
+    (binary_table, unary_table)
 }
 
 pub const OP_BINARY_INDEX_TABLE: [OpIndex; BINARY_OPERATORS.len()] = gen_index_tables().0;
 pub const OP_UNARY_INDEX_TABLE: [OpIndex; UNARY_OPERATORS.len()] = gen_index_tables().1;
-pub const OP_TERNARY_INDEX_TABLE: [OpIndex; TERNARY_OPERATORS.len()] = gen_index_tables().2;
 
 pub const OP_NAME_TABLE: [&'static str; 256] = {
     let mut table = [""; 256];

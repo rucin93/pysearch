@@ -118,7 +118,7 @@ impl Expr {
 
 impl Display for Expr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if self.op_idx == OP_TERNARY_INDEX_TABLE[0] {
+        if self.op_idx == OP_INDEX_TERNARY {
             if let Some(left) = self.left {
               Self::fmt(unsafe { left.as_ref() }, f)?;
               write!(f, "?")?;
