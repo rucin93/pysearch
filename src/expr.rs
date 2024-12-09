@@ -12,6 +12,7 @@ pub type VarCount = [u8; INPUTS.len()];
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Expr {
     pub left: Option<NonNull<Expr>>,
+    pub middle: Option<NonNull<Expr>>,
     pub right: Option<NonNull<Expr>>,
     pub op_idx: OpIndex,
     pub var_count: VarCount,
@@ -30,6 +31,7 @@ impl Expr {
         var_count[index] = 1;
         Self {
             left: None,
+            middle: None,
             right: None,
             op_idx: OP_INDEX_VARIABLE,
             var_count,
@@ -40,6 +42,7 @@ impl Expr {
     pub fn literal(value: Num) -> Self {
         Self {
             left: None,
+            middle: None,
             right: None,
             op_idx: OP_INDEX_LITERAL,
             var_count: [0; INPUTS.len()],
@@ -51,6 +54,10 @@ impl Expr {
         self.var_count.iter().all(|&var_count| var_count == 0)
     }
 
+    // pub fn is_ternary(&self) -> bool {
+    //     self.op_idx == OP_TERNARY_INDEX_TABLE[0]
+    // }
+
     pub fn bin(
         el: NonNull<Expr>,
         er: NonNull<Expr>,
@@ -60,6 +67,7 @@ impl Expr {
     ) -> Self {
         Self {
             left: Some(el),
+            middle: None,
             right: Some(er),
             op_idx,
             var_count,
@@ -70,6 +78,7 @@ impl Expr {
     pub fn unary(er: &Expr, op_idx: OpIndex, output: Vector) -> Self {
         Self {
             left: None,
+            middle: None,
             right: Some(er.into()),
             op_idx,
             var_count: er.var_count,
@@ -80,16 +89,46 @@ impl Expr {
     pub fn parens(er: &Expr) -> Self {
         Self {
             left: None,
+            middle: None,
             right: Some(er.into()),
             op_idx: OP_INDEX_PARENS,
             var_count: er.var_count,
             output: er.output.clone(),
         }
     }
+
+    pub fn ternary(
+      el: NonNull<Expr>,
+      em: NonNull<Expr>,
+      er: NonNull<Expr>,
+      op_idx: OpIndex,
+      var_count: VarCount,
+      output: Vector,
+  ) -> Self {
+      Self {
+          left: Some(el),
+          middle: Some(em),
+          right: Some(er),
+          op_idx,
+          var_count,
+          output,
+      }
+  }
 }
 
 impl Display for Expr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if self.op_idx == OP_TERNARY_INDEX_TABLE[0] {
+            if let Some(left) = self.left {
+              Self::fmt(unsafe { left.as_ref() }, f)?;
+              write!(f, "?")?;
+              Self::fmt(unsafe { self.middle.unwrap().as_ref() }, f)?;
+              write!(f, ":")?;
+              Self::fmt(unsafe { self.right.unwrap().as_ref() }, f)?;
+
+              return Ok(());
+            }
+        }
         if let Some(left) = self.left {
             Self::fmt(unsafe { left.as_ref() }, f)?;
         }

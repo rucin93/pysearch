@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use crate::{
     expr::{ok_after_keyword, ok_before_keyword, Expr},
-    params::{Num, BINARY_OPERATORS, ERROR_VALUE, UNARY_OPERATORS},
+    params::{Num, BINARY_OPERATORS, ERROR_VALUE, UNARY_OPERATORS, TERNARY_OPERATORS},
     vec::Vector,
 };
 
@@ -56,6 +56,47 @@ pub struct BinaryOp {
     pub commutative: bool,
     pub right_assoc: bool,
     pub short_circuit: bool,
+}
+
+#[derive(Clone, Copy)]
+pub struct TernaryOp {
+    pub name: &'static str,
+    pub prec: Prec,
+    pub apply: fn(Num, Num, Num) -> Option<Num>,
+    pub can_apply: fn(&Expr, &Expr, &Expr) -> bool,
+    pub commutative: bool,
+    pub right_assoc: bool,
+    pub short_circuit: bool,
+}
+
+impl TernaryOp {
+    pub const PREC: Prec = 2;
+
+    #[inline(always)]
+    pub fn apply_(&self, l: Num, m: Num, r: Num) -> Option<Num> {
+        if Some(l) == ERROR_VALUE || Some(m) == ERROR_VALUE || Some(r) == ERROR_VALUE {
+            ERROR_VALUE
+        } else {
+            (self.apply)(l, m, r)
+        }
+    }
+
+    #[inline(always)]
+    pub fn vec_apply(&self, mut vl: Vector, vm: Vector, vr: Vector) -> Option<Vector> {
+        for ((l, &m), &r) in vl.iter_mut().zip(vm.iter()).zip(vr.iter()) {
+            *l = self.apply_(*l, m, r)?;
+        }
+        Some(vl)
+    }
+
+    #[inline(always)]
+    pub fn can_apply(&self, el: &Expr, em: &Expr, er: &Expr) -> bool {
+        if !(self.can_apply)(el, em, er) {
+            return false;
+        }
+        
+        true
+    }
 }
 
 impl UnaryOp {
@@ -350,66 +391,66 @@ pub const OP_AND_LOGICAL: BinaryOp = BinaryOp {
 };
 pub const OP_LT: BinaryOp = BinaryOp {
     name: "<",
-    prec: 5,
+    prec: 9,
     apply: apply_lt,
     ..BinaryOp::EMPTY
 };
 pub const OP_LE: BinaryOp = BinaryOp {
     name: "<=",
-    prec: 5,
+    prec: 9,
     apply: apply_le,
     ..BinaryOp::EMPTY
 };
 pub const OP_GT: BinaryOp = BinaryOp {
     name: ">",
-    prec: 5,
+    prec: 9,
     apply: apply_gt,
     ..BinaryOp::EMPTY
 };
 pub const OP_GE: BinaryOp = BinaryOp {
     name: ">=",
-    prec: 5,
+    prec: 9,
     apply: apply_ge,
     ..BinaryOp::EMPTY
 };
 pub const OP_EQ: BinaryOp = BinaryOp {
     name: "==",
-    prec: 5,
+    prec: 8,
     apply: apply_eq,
     commutative: true,
     ..BinaryOp::EMPTY
 };
 pub const OP_NE: BinaryOp = BinaryOp {
     name: "!=",
-    prec: 5,
+    prec: 8,
     apply: apply_ne,
     commutative: true,
     ..BinaryOp::EMPTY
 };
 pub const OP_BIT_OR: BinaryOp = BinaryOp {
     name: "|",
-    prec: 6,
+    prec: 5,
     apply: apply_bit_or,
     commutative: true,
     ..BinaryOp::EMPTY
 };
 pub const OP_BIT_XOR: BinaryOp = BinaryOp {
     name: "^",
-    prec: 7,
+    prec: 6,
     apply: apply_bit_xor,
     commutative: true,
     ..BinaryOp::EMPTY
 };
 pub const OP_BIT_AND: BinaryOp = BinaryOp {
     name: "&",
-    prec: 8,
+    prec: 7,
     apply: apply_bit_and,
     commutative: true,
     ..BinaryOp::EMPTY
 };
 pub const OP_BIT_SHL: BinaryOp = BinaryOp {
     name: "<<",
-    prec: 9,
+    prec: 10,
     apply: apply_bit_shl,
     ..BinaryOp::EMPTY
 };
@@ -419,7 +460,7 @@ pub const OP_BIT_SHL_WRAP: BinaryOp = BinaryOp {
 };
 pub const OP_BIT_SHR: BinaryOp = BinaryOp {
     name: ">>",
-    prec: 9,
+    prec: 10,
     apply: apply_bit_shr,
     ..BinaryOp::EMPTY
 };
@@ -429,45 +470,45 @@ pub const OP_BIT_SHR_WRAP: BinaryOp = BinaryOp {
 };
 pub const OP_ADD: BinaryOp = BinaryOp {
     name: "+",
-    prec: 10,
+    prec: 11,
     apply: apply_add,
     commutative: true,
     ..BinaryOp::EMPTY
 };
 pub const OP_SUB: BinaryOp = BinaryOp {
     name: "-",
-    prec: 10,
+    prec: 11,
     apply: apply_sub,
     ..BinaryOp::EMPTY
 };
 pub const OP_MUL: BinaryOp = BinaryOp {
     name: "*",
-    prec: 11,
+    prec: 12,
     apply: apply_mul,
     commutative: true,
     ..BinaryOp::EMPTY
 };
 pub const OP_MOD_FLOOR: BinaryOp = BinaryOp {
     name: "%",
-    prec: 11,
+    prec: 12,
     apply: apply_mod_floor,
     ..BinaryOp::EMPTY
 };
 pub const OP_MOD_TRUNC: BinaryOp = BinaryOp {
     name: "%",
-    prec: 11,
+    prec: 12,
     apply: apply_mod_trunc,
     ..BinaryOp::EMPTY
 };
 pub const OP_DIV_FLOOR: BinaryOp = BinaryOp {
     name: "//",
-    prec: 11,
+    prec: 12,
     apply: apply_div_floor,
     ..BinaryOp::EMPTY
 };
 pub const OP_DIV_TRUNC: BinaryOp = BinaryOp {
     name: "/",
-    prec: 11,
+    prec: 12,
     apply: apply_div_trunc,
     ..BinaryOp::EMPTY
 };
@@ -487,21 +528,31 @@ pub const OP_EXP: BinaryOp = BinaryOp {
 };
 pub const OP_BIT_NEG: UnaryOp = UnaryOp {
     name: "~",
-    prec: 12,
+    prec: 14,
     apply: apply_bit_neg,
     can_apply: can_apply_unary_always,
 };
 pub const OP_NEG: UnaryOp = UnaryOp {
     name: "-",
-    prec: 12,
+    prec: 14,
     apply: apply_neg,
     can_apply: can_apply_unary_always,
 };
 pub const OP_NOT: UnaryOp = UnaryOp {
     name: "!",
-    prec: 12,
+    prec: 14,
     apply: apply_not,
     can_apply: can_apply_unary_always,
+};
+
+pub const OP_TERNARY: TernaryOp = TernaryOp {
+  name: "?:",
+  prec: 11,
+  apply: |l, m, r| Some(if m as Num != 0 { l } else { r }),
+  can_apply: |_, _, _| true,
+  commutative: false,
+  right_assoc: false,
+  short_circuit: false,
 };
 
 // All operators: [..Binary, ..Unary, Parens, Literal, Variable]
@@ -513,9 +564,11 @@ pub const OP_INDEX_VARIABLE: OpIndex = OpIndex::new(0xFF);
 const fn gen_index_tables() -> (
     [OpIndex; BINARY_OPERATORS.len()],
     [OpIndex; UNARY_OPERATORS.len()],
+    [OpIndex; TERNARY_OPERATORS.len()],
 ) {
     let mut binary_table = [OpIndex::new(0); BINARY_OPERATORS.len()];
     let mut unary_table = [OpIndex::new(0); UNARY_OPERATORS.len()];
+    let mut ternary_table = [OpIndex::new(0); TERNARY_OPERATORS.len()];
     let mut cnt = [0; 16];
 
     let mut i: usize = 0;
@@ -536,11 +589,22 @@ const fn gen_index_tables() -> (
         i += 1;
     }
 
-    (binary_table, unary_table)
+    let mut i: usize = 0;
+    while i < TERNARY_OPERATORS.len() {
+        let prec = TERNARY_OPERATORS[i].prec;
+        assert!(prec < 16 && cnt[prec as usize] < 16);
+        ternary_table[i] = OpIndex(prec << 4 | cnt[prec as usize]);
+        cnt[prec as usize] += 1;
+        i += 1;
+    }
+
+    (binary_table, unary_table, ternary_table)
 }
 
 pub const OP_BINARY_INDEX_TABLE: [OpIndex; BINARY_OPERATORS.len()] = gen_index_tables().0;
 pub const OP_UNARY_INDEX_TABLE: [OpIndex; UNARY_OPERATORS.len()] = gen_index_tables().1;
+pub const OP_TERNARY_INDEX_TABLE: [OpIndex; TERNARY_OPERATORS.len()] = gen_index_tables().2;
+
 pub const OP_NAME_TABLE: [&'static str; 256] = {
     let mut table = [""; 256];
     let mut i: usize = 0;
