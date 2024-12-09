@@ -318,231 +318,231 @@ pub fn can_apply_space_keyword_space(el: &Expr, er: &Expr) -> bool {
 }
 
 pub const OP_OR: BinaryOp = BinaryOp {
-    name: "or",
-    prec: 3,
-    apply: apply_or,
-    can_apply: can_apply_keyword,
-    short_circuit: true,
-    ..BinaryOp::EMPTY
+  name: "or",
+  prec: 3,
+  apply: apply_or,
+  can_apply: can_apply_keyword,
+  short_circuit: true,
+  ..BinaryOp::EMPTY
 };
 pub const OP_SPACE_OR: BinaryOp = BinaryOp {
-    name: " or",
-    can_apply: can_apply_space_keyword,
-    ..OP_OR
+  name: " or",
+  can_apply: can_apply_space_keyword,
+  ..OP_OR
 };
 pub const OP_OR_SPACE: BinaryOp = BinaryOp {
-    name: "or ",
-    can_apply: can_apply_keyword_space,
-    ..OP_OR
+  name: "or ",
+  can_apply: can_apply_keyword_space,
+  ..OP_OR
 };
 pub const OP_SPACE_OR_SPACE: BinaryOp = BinaryOp {
-    name: " or ",
-    can_apply: can_apply_space_keyword_space,
-    ..OP_OR
+  name: " or ",
+  can_apply: can_apply_space_keyword_space,
+  ..OP_OR
 };
 pub const OP_OR_SYMBOL: BinaryOp = BinaryOp {
-    name: "||",
-    can_apply: can_apply_binary_always,
-    ..OP_OR
+  name: "||",
+  can_apply: can_apply_binary_always,
+  ..OP_OR
 };
 pub const OP_OR_LOGICAL: BinaryOp = BinaryOp {
-    name: "||",
-    prec: 3,
-    apply: apply_or_logical,
-    commutative: true,
-    short_circuit: true,
-    ..BinaryOp::EMPTY
+  name: "||",
+  prec: 3,
+  apply: apply_or_logical,
+  commutative: true,
+  short_circuit: true,
+  ..BinaryOp::EMPTY
 };
 pub const OP_AND: BinaryOp = BinaryOp {
-    name: "and",
-    prec: 4,
-    apply: apply_and,
-    can_apply: can_apply_keyword,
-    short_circuit: true,
-    ..BinaryOp::EMPTY
+  name: "and",
+  prec: 4,
+  apply: apply_and,
+  can_apply: can_apply_keyword,
+  short_circuit: true,
+  ..BinaryOp::EMPTY
 };
 pub const OP_SPACE_AND: BinaryOp = BinaryOp {
-    name: " and",
-    can_apply: can_apply_space_keyword,
-    ..OP_AND
+  name: " and",
+  can_apply: can_apply_space_keyword,
+  ..OP_AND
 };
 pub const OP_AND_SPACE: BinaryOp = BinaryOp {
-    name: "and ",
-    can_apply: can_apply_keyword_space,
-    ..OP_AND
+  name: "and ",
+  can_apply: can_apply_keyword_space,
+  ..OP_AND
 };
 pub const OP_SPACE_AND_SPACE: BinaryOp = BinaryOp {
-    name: " and ",
-    can_apply: can_apply_space_keyword_space,
-    ..OP_AND
+  name: " and ",
+  can_apply: can_apply_space_keyword_space,
+  ..OP_AND
 };
 pub const OP_AND_SYMBOL: BinaryOp = BinaryOp {
-    name: "&&",
-    can_apply: can_apply_binary_always,
-    ..OP_AND
+  name: "&&",
+  can_apply: can_apply_binary_always,
+  ..OP_AND
 };
 pub const OP_AND_LOGICAL: BinaryOp = BinaryOp {
-    name: "&&",
-    prec: 4,
-    apply: apply_and_logical,
-    commutative: true,
-    short_circuit: true,
-    ..BinaryOp::EMPTY
+  name: "&&",
+  prec: 4,
+  apply: apply_and_logical,
+  commutative: true,
+  short_circuit: true,
+  ..BinaryOp::EMPTY
 };
 pub const OP_LT: BinaryOp = BinaryOp {
-    name: "<",
-    prec: 9,
-    apply: apply_lt,
-    ..BinaryOp::EMPTY
+  name: "<",
+  prec: 5,
+  apply: apply_lt,
+  ..BinaryOp::EMPTY
 };
 pub const OP_LE: BinaryOp = BinaryOp {
-    name: "<=",
-    prec: 9,
-    apply: apply_le,
-    ..BinaryOp::EMPTY
+  name: "<=",
+  prec: 5,
+  apply: apply_le,
+  ..BinaryOp::EMPTY
 };
 pub const OP_GT: BinaryOp = BinaryOp {
-    name: ">",
-    prec: 9,
-    apply: apply_gt,
-    ..BinaryOp::EMPTY
+  name: ">",
+  prec: 5,
+  apply: apply_gt,
+  ..BinaryOp::EMPTY
 };
 pub const OP_GE: BinaryOp = BinaryOp {
-    name: ">=",
-    prec: 9,
-    apply: apply_ge,
-    ..BinaryOp::EMPTY
+  name: ">=",
+  prec: 5,
+  apply: apply_ge,
+  ..BinaryOp::EMPTY
 };
 pub const OP_EQ: BinaryOp = BinaryOp {
-    name: "==",
-    prec: 8,
-    apply: apply_eq,
-    commutative: true,
-    ..BinaryOp::EMPTY
+  name: "==",
+  prec: 5,
+  apply: apply_eq,
+  commutative: true,
+  ..BinaryOp::EMPTY
 };
 pub const OP_NE: BinaryOp = BinaryOp {
-    name: "!=",
-    prec: 8,
-    apply: apply_ne,
-    commutative: true,
-    ..BinaryOp::EMPTY
+  name: "!=",
+  prec: 5,
+  apply: apply_ne,
+  commutative: true,
+  ..BinaryOp::EMPTY
 };
 pub const OP_BIT_OR: BinaryOp = BinaryOp {
-    name: "|",
-    prec: 5,
-    apply: apply_bit_or,
-    commutative: true,
-    ..BinaryOp::EMPTY
+  name: "|",
+  prec: 6,
+  apply: apply_bit_or,
+  commutative: true,
+  ..BinaryOp::EMPTY
 };
 pub const OP_BIT_XOR: BinaryOp = BinaryOp {
-    name: "^",
-    prec: 6,
-    apply: apply_bit_xor,
-    commutative: true,
-    ..BinaryOp::EMPTY
+  name: "^",
+  prec: 7,
+  apply: apply_bit_xor,
+  commutative: true,
+  ..BinaryOp::EMPTY
 };
 pub const OP_BIT_AND: BinaryOp = BinaryOp {
-    name: "&",
-    prec: 7,
-    apply: apply_bit_and,
-    commutative: true,
-    ..BinaryOp::EMPTY
+  name: "&",
+  prec: 8,
+  apply: apply_bit_and,
+  commutative: true,
+  ..BinaryOp::EMPTY
 };
 pub const OP_BIT_SHL: BinaryOp = BinaryOp {
-    name: "<<",
-    prec: 10,
-    apply: apply_bit_shl,
-    ..BinaryOp::EMPTY
+  name: "<<",
+  prec: 9,
+  apply: apply_bit_shl,
+  ..BinaryOp::EMPTY
 };
 pub const OP_BIT_SHL_WRAP: BinaryOp = BinaryOp {
-    apply: apply_bit_shl_wrap,
-    ..OP_BIT_SHL
+  apply: apply_bit_shl_wrap,
+  ..OP_BIT_SHL
 };
 pub const OP_BIT_SHR: BinaryOp = BinaryOp {
-    name: ">>",
-    prec: 10,
-    apply: apply_bit_shr,
-    ..BinaryOp::EMPTY
+  name: ">>",
+  prec: 9,
+  apply: apply_bit_shr,
+  ..BinaryOp::EMPTY
 };
 pub const OP_BIT_SHR_WRAP: BinaryOp = BinaryOp {
-    apply: apply_bit_shr_wrap,
-    ..OP_BIT_SHR
+  apply: apply_bit_shr_wrap,
+  ..OP_BIT_SHR
 };
 pub const OP_ADD: BinaryOp = BinaryOp {
-    name: "+",
-    prec: 11,
-    apply: apply_add,
-    commutative: true,
-    ..BinaryOp::EMPTY
+  name: "+",
+  prec: 10,
+  apply: apply_add,
+  commutative: true,
+  ..BinaryOp::EMPTY
 };
 pub const OP_SUB: BinaryOp = BinaryOp {
-    name: "-",
-    prec: 11,
-    apply: apply_sub,
-    ..BinaryOp::EMPTY
+  name: "-",
+  prec: 10,
+  apply: apply_sub,
+  ..BinaryOp::EMPTY
 };
 pub const OP_MUL: BinaryOp = BinaryOp {
-    name: "*",
-    prec: 12,
-    apply: apply_mul,
-    commutative: true,
-    ..BinaryOp::EMPTY
+  name: "*",
+  prec: 11,
+  apply: apply_mul,
+  commutative: true,
+  ..BinaryOp::EMPTY
 };
 pub const OP_MOD_FLOOR: BinaryOp = BinaryOp {
-    name: "%",
-    prec: 12,
-    apply: apply_mod_floor,
-    ..BinaryOp::EMPTY
+  name: "%",
+  prec: 11,
+  apply: apply_mod_floor,
+  ..BinaryOp::EMPTY
 };
 pub const OP_MOD_TRUNC: BinaryOp = BinaryOp {
-    name: "%",
-    prec: 12,
-    apply: apply_mod_trunc,
-    ..BinaryOp::EMPTY
+  name: "%",
+  prec: 11,
+  apply: apply_mod_trunc,
+  ..BinaryOp::EMPTY
 };
 pub const OP_DIV_FLOOR: BinaryOp = BinaryOp {
-    name: "//",
-    prec: 12,
-    apply: apply_div_floor,
-    ..BinaryOp::EMPTY
+  name: "//",
+  prec: 11,
+  apply: apply_div_floor,
+  ..BinaryOp::EMPTY
 };
 pub const OP_DIV_TRUNC: BinaryOp = BinaryOp {
-    name: "/",
-    prec: 12,
-    apply: apply_div_trunc,
-    ..BinaryOp::EMPTY
+  name: "/",
+  prec: 11,
+  apply: apply_div_trunc,
+  ..BinaryOp::EMPTY
 };
 pub const OP_GCD: BinaryOp = BinaryOp {
-    name: "V",
-    prec: 11,
-    apply: apply_gcd,
-    commutative: true,
-    ..BinaryOp::EMPTY
+  name: "V",
+  prec: 11,
+  apply: apply_gcd,
+  commutative: true,
+  ..BinaryOp::EMPTY
 };
 pub const OP_EXP: BinaryOp = BinaryOp {
-    name: "**",
-    prec: 13,
-    apply: apply_exp,
-    right_assoc: true,
-    ..BinaryOp::EMPTY
+  name: "**",
+  prec: 13,
+  apply: apply_exp,
+  right_assoc: true,
+  ..BinaryOp::EMPTY
 };
 pub const OP_BIT_NEG: UnaryOp = UnaryOp {
-    name: "~",
-    prec: 14,
-    apply: apply_bit_neg,
-    can_apply: can_apply_unary_always,
+  name: "~",
+  prec: 12,
+  apply: apply_bit_neg,
+  can_apply: can_apply_unary_always,
 };
 pub const OP_NEG: UnaryOp = UnaryOp {
-    name: "-",
-    prec: 14,
-    apply: apply_neg,
-    can_apply: can_apply_unary_always,
+  name: "-",
+  prec: 12,
+  apply: apply_neg,
+  can_apply: can_apply_unary_always,
 };
 pub const OP_NOT: UnaryOp = UnaryOp {
-    name: "!",
-    prec: 14,
-    apply: apply_not,
-    can_apply: can_apply_unary_always,
+  name: "!",
+  prec: 12,
+  apply: apply_not,
+  can_apply: can_apply_unary_always,
 };
 
 pub const OP_TERNARY: TernaryOp = TernaryOp {
