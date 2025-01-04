@@ -9,7 +9,7 @@ use crate::{
 
 pub type VarCount = [u8; INPUTS.len()];
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Expr {
     pub left: Option<NonNull<Expr>>,
     pub middle: Option<NonNull<Expr>>,

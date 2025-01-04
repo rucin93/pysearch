@@ -177,73 +177,73 @@ impl BinaryOp {
 }
 
 pub fn apply_or(l: Num, r: Num) -> Option<Num> {
-    Some(if l != 0 { l } else { r })
+    Some(if l != 0.0 { l } else { r })
 }
 pub fn apply_or_logical(l: Num, r: Num) -> Option<Num> {
-    if l == 0 && Some(r) == ERROR_VALUE {
+    if l == 0.0 && Some(r) == ERROR_VALUE {
         ERROR_VALUE
     } else {
-        Some((l != 0 || r != 0) as Num)
+        Some((l != 0.0 || r != 0.0) as i64 as Num)
     }
 }
 pub fn apply_and(l: Num, r: Num) -> Option<Num> {
-    Some(if l != 0 { r } else { l })
+    Some(if l != 0.0 { r } else { l })
 }
 pub fn apply_and_logical(l: Num, r: Num) -> Option<Num> {
-    if l != 0 && Some(r) == ERROR_VALUE {
+    if l != 0.0 && Some(r) == ERROR_VALUE {
         ERROR_VALUE
     } else {
-        Some((l != 0 && r != 0) as Num)
+        Some((l != 0.0 && r != 0.0) as i64 as Num)
     }
 }
 pub fn apply_lt(l: Num, r: Num) -> Option<Num> {
-    Some((l < r) as Num)
+    Some((l < r) as i64 as Num)
 }
 pub fn apply_le(l: Num, r: Num) -> Option<Num> {
-    Some((l <= r) as Num)
+    Some((l <= r) as i64 as Num)
 }
 pub fn apply_gt(l: Num, r: Num) -> Option<Num> {
-    Some((l > r) as Num)
+    Some((l > r) as i64 as Num)
 }
 pub fn apply_ge(l: Num, r: Num) -> Option<Num> {
-    Some((l >= r) as Num)
+    Some((l >= r) as i64 as Num)
 }
 pub fn apply_eq(l: Num, r: Num) -> Option<Num> {
-    Some((l == r) as Num)
+    Some((l == r) as i64 as Num)
 }
 pub fn apply_ne(l: Num, r: Num) -> Option<Num> {
-    Some((l != r) as Num)
+    Some((l != r) as i64 as Num)
 }
 pub fn apply_bit_or(l: Num, r: Num) -> Option<Num> {
-    Some(l | r)
+    Some((l as i64 | r as i64) as Num)
 }
 pub fn apply_bit_xor(l: Num, r: Num) -> Option<Num> {
-    Some(l ^ r)
+    Some((l as i64 ^ r as i64) as Num)
 }
 pub fn apply_bit_and(l: Num, r: Num) -> Option<Num> {
-    Some(l & r)
+    Some((l as i64 & r as i64) as Num)
 }
 pub fn apply_bit_shl(l: Num, r: Num) -> Option<Num> {
     #[allow(unused_comparisons)]
-    if r >= 0 && r < Num::BITS as Num {
-        Some(l << r)
+    if r >= 0.0 && r < i64::BITS as Num {
+        Some(((l as i64) << (r as i64)) as Num)
     } else {
         None
     }
 }
 pub fn apply_bit_shl_wrap(l: Num, r: Num) -> Option<Num> {
-    Some(l << r)
+  Some(((l as i64) << (r as i64)) as Num)
 }
 pub fn apply_bit_shr(l: Num, r: Num) -> Option<Num> {
     #[allow(unused_comparisons)]
-    if r >= 0 {
-        Some(l >> r.min(Num::BITS as Num - 1))
+    if r >= 0.0 {
+        Some(((l as i64) >> ((r as i64).min(63) as i64)) as Num)
     } else {
         None
     }
 }
 pub fn apply_bit_shr_wrap(l: Num, r: Num) -> Option<Num> {
-    Some(l >> r)
+  Some(((l as i64) >> (r as i64)) as Num)
 }
 pub fn apply_add(l: Num, r: Num) -> Option<Num> {
     Some(l + r)
@@ -256,40 +256,44 @@ pub fn apply_mul(l: Num, r: Num) -> Option<Num> {
 }
 pub fn apply_mod_floor(l: Num, r: Num) -> Option<Num> {
     #[allow(unused_comparisons)]
-    if r == 0 || (Num::MIN < 0 && l == Num::MIN && r == !0) {
+    if r == 0.0 || (Num::MIN < 0.0 && l == Num::MIN && r == !0 as Num) {
         None
     } else {
-        Some(num_integer::mod_floor(l, r))
+        Some(num_integer::mod_floor(l as i64, r as i64) as Num)
     }
 }
 pub fn apply_mod_trunc(l: Num, r: Num) -> Option<Num> {
-    l.checked_rem(r)
+  // imitate JS behavior
+  Some(l % r)
+
+    // (l as i64).checked_rem(r as i64).map(|res| res as Num)
 }
 pub fn apply_div_floor(l: Num, r: Num) -> Option<Num> {
     #[allow(unused_comparisons)]
-    if r == 0 || (Num::MIN < 0 && l == Num::MIN && r == !0) {
+    if r == 0.0 || (Num::MIN < 0.0 && l == Num::MIN && r as i64 == !0) {
         None
     } else {
-        Some(num_integer::div_floor(l, r))
+        Some(num_integer::div_floor(l as i64, r as i64) as Num)
     }
 }
 pub fn apply_div_trunc(l: Num, r: Num) -> Option<Num> {
-    l.checked_div(r)
+    // (l as i64).checked_div(r as i64).map(|res| res as Num)
+    Some(l / r)
 }
 pub fn apply_gcd(l: Num, r: Num) -> Option<Num> {
-    Some(num_integer::gcd(l, r))
+    Some(num_integer::gcd(l as i64, r as i64) as Num)
 }
 pub fn apply_exp(l: Num, r: Num) -> Option<Num> {
-    l.checked_pow(r.try_into().ok()?)
+    (l as i64).checked_pow((r as i64).try_into().ok()?).map(|res| res as Num)
 }
 pub fn apply_bit_neg(x: Num) -> Num {
-    !x
+    !(x as i64) as Num
 }
 pub fn apply_neg(x: Num) -> Num {
-    0 - x
+    0.0 - x
 }
 pub fn apply_not(x: Num) -> Num {
-    (x == 0) as Num
+    ((x as i64) == 0) as i64 as Num
 }
 
 #[inline(always)]
@@ -547,8 +551,8 @@ pub const OP_NOT: UnaryOp = UnaryOp {
 
 pub const OP_TERNARY: TernaryOp = TernaryOp {
   name: "?:",
-  prec: 11,
-  apply: |l, m, r| Some(if m as Num != 0 { l } else { r }),
+  prec: 14,
+  apply: |l, m, r| Some(if m as Num != 0.0 { l } else { r }),
   can_apply: |_, _, _| true,
   commutative: false,
   right_assoc: false,

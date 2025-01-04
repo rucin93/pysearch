@@ -18,6 +18,7 @@ use vec::Vector;
 
 use hashbrown::{hash_set::Entry, HashMap, HashSet};
 use seq_macro::seq;
+use ordered_float::OrderedFloat;
 use std::time::Instant;
 
 // cache[length][output] = highest-prec expression of that length yielding that output
@@ -28,8 +29,8 @@ type HashSetCache = HashSet<NonNullExpr>;
 
 fn positive_integer_length(mut k: Num) -> usize {
     let mut l = 1;
-    while k >= 10 {
-        k /= 10;
+    while k >= 10 as Num {
+        k /= 10 as Num;
         l += 1;
     }
     l
@@ -84,14 +85,16 @@ fn save(level: &mut CacheLevel, expr: Expr, n: usize, cache: &Cache, hashset_cac
             .all(|(&c, i)| c == i.max_uses);
 
     if cant_use_more_vars {
-        let mut mp: HashMap<Num, Num> = HashMap::new();
+        let mut mp: HashMap<OrderedFloat<Num>, OrderedFloat<Num>> = HashMap::new();
         for i in 0..GOAL.len() {
-            if let Some(old) = mp.insert(expr.output[i], GOAL[i]) {
+            if let Some(old) = mp.insert(OrderedFloat(expr.output[i]), OrderedFloat(GOAL[i])) {
+            // if let Some(old) = mp.insert(expr.output[i], GOAL[i]) {
                 if old != GOAL[i] {
                     return;
                 }
-            }
+            // }
         }
+      }
     }
 
     if n <= MAX_LENGTH - 2 {
@@ -349,11 +352,15 @@ fn find_variables_and_literals(cn: &mut CacheLevel, n: usize) {
             cn.push(Expr::literal(lit));
         }
     }
-    if MAX_LITERAL > 0 {
-        if let Some(m) = (10 as Num).checked_pow(n as u32 - 1) {
-            for lit in m..=m.saturating_mul(9).saturating_add(m - 1).min(MAX_LITERAL) {
+    if MAX_LITERAL > 0.0 {
+        // cn push literals from 0.0 to MAX_LITERAL with step of 0.1
+        
+        let mut lit = 0.0;
+        while lit <= MAX_LITERAL {
+            if positive_integer_length(lit) == n {
                 cn.push(Expr::literal(lit));
             }
+            lit += 0.1;
         }
     }
 }
@@ -413,6 +420,16 @@ fn find_expressions_multithread(
             })
         })
         .chain(
+          std::iter::once_with(|| {
+              let mut cn = CacheLevel::new();
+              if USE_TERNARY {
+                find_ternary_expressions(&mut cn, cache, hashset_cache, n);
+              }
+              cn
+          })
+          .par_bridge(),
+        )
+        .chain(
             std::iter::once_with(|| {
                 let mut cn = CacheLevel::new();
                 find_parens_expressions(&mut cn, cache, hashset_cache, n);
@@ -427,16 +444,6 @@ fn find_expressions_multithread(
                 cn
             })
             .par_bridge(),
-        )
-        .chain(
-          std::iter::once_with(|| {
-              let mut cn = CacheLevel::new();
-              if USE_TERNARY {
-                find_ternary_expressions(&mut cn, cache, hashset_cache, n);
-              }
-              cn
-          })
-          .par_bridge(),
         )
         .flatten_iter()
         .collect();
@@ -483,7 +490,7 @@ fn validate_input() {
     for i in 0..INPUTS[0].vec.len() {
         let mut input = [0; INPUTS.len()];
         for j in 0..INPUTS.len() {
-            input[j] = INPUTS[j].vec[i];
+            input[j] = INPUTS[j].vec[i] as u8;
         }
         assert!(input_set.insert(input), "duplicated input {:?}", input);
     }

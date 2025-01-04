@@ -19,7 +19,7 @@ rayon = "1.7.0"
 hashbrown = "0.14.0"
 num-integer = "0.1.45"
 seq-macro = "0.3"
-
+ordered-float = "2.1"
 # Doesn't seem to help much:
 # [profile.release]
 # lto = true

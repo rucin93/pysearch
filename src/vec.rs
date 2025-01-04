@@ -1,10 +1,25 @@
 use std::ops::{Deref, DerefMut};
-
+use std::hash::{Hash, Hasher};
 use crate::params::{Num, GOAL};
 
-#[derive(Clone, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Debug, PartialOrd)]
 pub struct Vector([Num; GOAL.len()]);
 
+impl PartialEq for Vector {
+    fn eq(&self, other: &Self) -> bool {
+        self.0.iter().zip(other.0.iter()).all(|(a, b)| a == b)
+    }
+}
+impl Hash for Vector {
+
+  fn hash<H: Hasher>(&self, state: &mut H) {
+      // Implement the hashing logic for Vector
+      // For example, if Vector contains a Vec<f64>, you can hash each element
+      for element in &self.0 {
+          state.write_u64(element.to_bits());
+      }
+  }
+}
 impl Vector {
     pub fn constant(n: Num) -> Vector {
         Vector([n; GOAL.len()])
@@ -59,7 +74,7 @@ macro_rules! impl_unary {
 
             fn $func(mut self) -> Self::Output {
                 for x in self.iter_mut() {
-                    *x = $op(*x);
+                    *x = $op(*x)
                 }
                 self
             }
@@ -72,10 +87,6 @@ impl_op!(Sub, sub, -=);
 impl_op!(Mul, mul, *=);
 impl_op!(Div, div, /=);
 impl_op!(Rem, rem, %=);
-impl_op!(BitAnd, bitand, &=);
-impl_op!(BitOr, bitor, |=);
-impl_op!(BitXor, bitxor, ^=);
-impl_op!(Shl, shl, <<=);
-impl_op!(Shr, shr, >>=);
-impl_unary!(Not, not, !);
-impl_unary!(Neg, neg, (|x| 0 - x));
+// Removed bitwise and shift operations as they cannot be applied to f64
+// Removed Not implementation as it cannot be applied to f64
+impl_unary!(Neg, neg, (|x| 0.0 - x));
